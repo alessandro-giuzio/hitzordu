@@ -22,6 +22,7 @@ class Activator {
 	 */
 	public static function activate(): void {
 		self::create_tables();
+    self::seed_defaults();
 		update_option( 'hitzordu_db_version', self::DB_VERSION );
 	}
 
@@ -95,4 +96,44 @@ class Activator {
 			dbDelta( $statement );
 		}
 	}
+
+  /**
+   * Insert a default meeting type and weekly hours on a fresh install.
+   */
+  public static function seed_defaults(): void
+  {
+    global $wpdb;
+
+    $prefix = $wpdb->prefix . 'hitzordu_';
+
+    // Only seed an empty install, so reactivating never duplicates rows.
+    $count = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$prefix}meeting_types");
+
+    if ($count > 0) {
+      return;
+    }
+
+    $wpdb->insert(
+      "{$prefix}meeting_types",
+      array(
+        'slug' => 'discovery-call',
+        'name' => 'Discovery call',
+        'duration_minutes' => 30,
+      ),
+      array('%s', '%s', '%d')
+    );
+
+    // Monday (1) to Friday (5), 09:00 to 17:00.
+    for ($weekday = 1; $weekday <= 5; $weekday++) {
+      $wpdb->insert(
+        "{$prefix}availability_rules",
+        array(
+          'weekday' => $weekday,
+          'start_time' => '09:00:00',
+          'end_time' => '17:00:00',
+        ),
+        array('%d', '%s', '%s')
+      );
+    }
+  }
 }
