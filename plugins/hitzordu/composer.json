@@ -10,5 +10,10 @@
   "require": {
     "php": ">=8.2",
     "agencyga/hitzordu-core": "@dev"
+  },
+  "autoload": {
+    "psr-4": {
+      "Hitzordu\\Plugin\\": "src/"
+    }
   }
 }
