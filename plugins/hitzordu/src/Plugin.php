@@ -47,9 +47,11 @@ class Plugin {
 	}
 
 	/**
-	 * TODO: register REST routes here.
+	 * Register the plugin's REST routes. Runs on rest_api_init.
 	 */
-	public function register_rest_routes(): void {
+	public function register_rest_routes(): void
+	{
+		(new Rest\AvailabilityController())->register_routes();
 	}
 
 	/**
