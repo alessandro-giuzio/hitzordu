@@ -5,13 +5,18 @@
   "require": {
     "php": ">=8.2"
   },
+  "require-dev": {
+    "pestphp/pest": "^4.0"
+  },
   "autoload": {
     "psr-4": {
       "Hitzordu\\Core\\": "src/"
     }
   },
-  "require-dev": {
-    "pestphp/pest": "^5.3"
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
   },
   "config": {
     "allow-plugins": {
