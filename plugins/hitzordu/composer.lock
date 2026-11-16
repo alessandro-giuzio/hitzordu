@@ -1,0 +1,48 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "90528d61821ac29324c066d26161b5d0",
+    "packages": [
+        {
+            "name": "agencyga/hitzordu-core",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "../../packages/core",
+                "reference": "e589ebead9a6885dd7b011b9da85bb3ca0ca056b"
+            },
+            "require": {
+                "php": ">=8.2"
+            },
+            "require-dev": {
+                "pestphp/pest": "^5.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Hitzordu\\Core\\": "src/"
+                }
+            },
+            "description": "Slot generation and booking rules for Hitzordu",
+            "transport-options": {
+                "relative": true
+            }
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": {
+        "agencyga/hitzordu-core": 20
+    },
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": {
+        "php": ">=8.2"
+    },
+    "platform-dev": {},
+    "plugin-api-version": "2.9.0"
+}

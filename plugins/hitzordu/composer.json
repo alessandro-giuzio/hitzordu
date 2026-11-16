@@ -1,0 +1,14 @@
+{
+  "name": "agencyga/hitzordu-plugin",
+  "type": "wordpress-plugin",
+  "repositories": [
+    {
+      "type": "path",
+      "url": "../../packages/core"
+    }
+  ],
+  "require": {
+    "php": ">=8.2",
+    "agencyga/hitzordu-core": "@dev"
+  }
+}

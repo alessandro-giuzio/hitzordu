@@ -1,0 +1,21 @@
+{
+  "name": "agencyga/hitzordu-core",
+  "description": "Slot generation and booking rules for Hitzordu",
+  "type": "library",
+  "require": {
+    "php": ">=8.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "Hitzordu\\Core\\": "src/"
+    }
+  },
+  "require-dev": {
+    "pestphp/pest": "^5.3"
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  }
+}
