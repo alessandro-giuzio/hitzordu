@@ -9,7 +9,7 @@ namespace Hitzordu\Plugin\Rest;
 
 use DateTimeImmutable;
 use DateTimeZone;
-use Hitzordu\Core\SlotGenerator;
+use Hitzordu\Plugin\Availability;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -242,31 +242,11 @@ class BookingsController
    */
   private function is_offered_slot(DateTimeImmutable $start, int $duration): bool
   {
-    global $wpdb;
+    $day = $start->setTimezone(wp_timezone())->setTime(0, 0);
 
-    if ($start <= new DateTimeImmutable('now', new DateTimeZone('UTC'))) {
-      return false;
-    }
-
-    $zone = wp_timezone();
-    $local = $start->setTimezone($zone);
-
-    $rules = $wpdb->get_results(
-      $wpdb->prepare(
-        "SELECT start_time, end_time FROM {$wpdb->prefix}hitzordu_availability_rules WHERE weekday = %d",
-        (int) $local->format('N')
-      )
-    );
-
-    $generator = new SlotGenerator();
-
-    foreach ($rules as $rule) {
-      $slots = $generator->forDay($local->format('Y-m-d'), $rule->start_time, $rule->end_time, $duration, $zone);
-
-      foreach ($slots as $slot) {
-        if ($slot->getTimestamp() === $start->getTimestamp()) {
-          return true;
-        }
+    foreach ((new Availability())->grid_slots($duration, $day, $day) as $slot) {
+      if ($slot->getTimestamp() === $start->getTimestamp()) {
+        return true;
       }
     }
 

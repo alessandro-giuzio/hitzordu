@@ -7,11 +7,9 @@
 
 namespace Hitzordu\Plugin\Rest;
 
-use DateInterval;
-use DatePeriod;
 use DateTimeImmutable;
 use DateTimeZone;
-use Hitzordu\Core\SlotGenerator;
+use Hitzordu\Plugin\Availability;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -101,36 +99,12 @@ class AvailabilityController
       );
     }
 
-    $rules = $wpdb->get_results(
-      "SELECT weekday, start_time, end_time FROM {$prefix}availability_rules"
-    );
-
-    $generator = new SlotGenerator();
     $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
     $slots = array();
-    $days = new DatePeriod($from, new DateInterval('P1D'), $to->modify('+1 day'));
+    $free = (new Availability())->free_slots((int) $type->duration_minutes, $from, $to);
 
-    foreach ($days as $day) {
-      foreach ($rules as $rule) {
-        // 'N' is the ISO weekday: 1 = Monday ... 7 = Sunday.
-        if ((int) $rule->weekday !== (int) $day->format('N')) {
-          continue;
-        }
-
-        $day_slots = $generator->forDay(
-          $day->format('Y-m-d'),
-          $rule->start_time,
-          $rule->end_time,
-          (int) $type->duration_minutes,
-          $zone
-        );
-
-        foreach ($day_slots as $slot) {
-          if ($slot > $now) {
-            $slots[] = $slot->format('Y-m-d\TH:i:s\Z');
-          }
-        }
-      }
+    foreach ($free as $slot) {
+      $slots[] = $slot->format('Y-m-d\TH:i:s\Z');
     }
 
     $response = new WP_REST_Response(
