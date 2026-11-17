@@ -52,8 +52,11 @@ class Notifier
       '',
       /* translators: %s: date and time with time zone. */
       sprintf(__('When: %s', 'hitzordu'), $this->format_when($start, new DateTimeZone($booking->timezone))),
-      /* translators: %d: meeting length in minutes. */
-      sprintf(__('Length: %d minutes', 'hitzordu'), (int) $booking->duration_minutes),
+      sprintf(
+        /* translators: %d: meeting length in minutes. */
+        _n('Length: %d minute', 'Length: %d minutes', (int) $booking->duration_minutes, 'hitzordu'),
+        (int) $booking->duration_minutes
+      ),
       '',
       __('Need to cancel? Use this link:', 'hitzordu'),
       $cancel_url,

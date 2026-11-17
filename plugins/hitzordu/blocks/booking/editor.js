@@ -1,6 +1,6 @@
 (function (blocks, element, blockEditor, components, i18n) {
   const el = element.createElement;
-  const { __, sprintf } = i18n;
+  const { __, _n, sprintf } = i18n;
   const { InspectorControls, useBlockProps } = blockEditor;
   const { PanelBody, Placeholder, SelectControl, TextControl } = components;
 
@@ -16,15 +16,19 @@
         ? types.map(type => ({ label: type.name, value: type.slug }))
         : [{ label: attributes.type, value: attributes.type }];
 
+      const minutes = current ? Number(current.duration_minutes) : 0;
+
       const instructions = current
         ? sprintf(
             /* translators: 1: meeting type name, 2: length in minutes. */
-            __(
+            _n(
+              'Visitors will book: %1$s (%2$d minute). The calendar appears on the published page.',
               'Visitors will book: %1$s (%2$d minutes). The calendar appears on the published page.',
+              minutes,
               'hitzordu',
             ),
             current.name,
-            Number(current.duration_minutes),
+            minutes,
           )
         : __('Choose a meeting type in the block settings.', 'hitzordu');
 

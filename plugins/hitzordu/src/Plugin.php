@@ -144,6 +144,13 @@ class Plugin {
 	public function register_block(): void
 	{
 		register_block_type(HITZORDU_DIR . 'blocks/booking');
+
+		// Load JSON translations for the editor script from /languages.
+		wp_set_script_translations(
+			generate_block_asset_handle('hitzordu/booking', 'editorScript'),
+			'hitzordu',
+			HITZORDU_DIR . 'languages'
+		);
 	}
 
 	/**
