@@ -19,6 +19,7 @@ class Plugin {
 		add_action( 'init', array( $this, 'load_textdomain' ) );
 		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'register_assets' ) );
+		add_action( 'init', array( $this, 'register_shortcode' ) );
 
 		$this->maybe_upgrade();
 	}
@@ -56,8 +57,40 @@ class Plugin {
 	}
 
 	/**
-	 * TODO: register and enqueue scripts and styles here.
+	 * Register the widget script. It is only loaded on pages that use the shortcode.
 	 */
 	public function register_assets(): void {
+		$file = plugin_dir_path( HITZORDU_FILE ) . 'public/js/hitzordu-widget.js';
+
+		wp_register_script_module(
+			'hitzordu-widget',
+			plugins_url( 'public/js/hitzordu-widget.js', HITZORDU_FILE ),
+			array(),
+			file_exists( $file ) ? (string) filemtime( $file ) : HITZORDU_VERSION
+		);
+	}
+
+	/**
+	 * Register the [hitzordu] shortcode.
+	 */
+	public function register_shortcode(): void {
+		add_shortcode( 'hitzordu', array( $this, 'render_shortcode' ) );
+	}
+
+	/**
+	 * Print the widget placeholder and ask WordPress to load the script.
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
+	public function render_shortcode( $atts ): string {
+		$atts = shortcode_atts( array( 'type' => 'discovery-call' ), $atts, 'hitzordu' );
+
+		wp_enqueue_script_module( 'hitzordu-widget' );
+
+		return sprintf(
+			'<div data-hitzordu-widget data-api-url="%1$s" data-meeting-type="%2$s"></div>',
+			esc_url( rest_url( 'hitzordu/v1' ) ),
+			esc_attr( sanitize_key( $atts['type'] ) )
+		);
 	}
 }

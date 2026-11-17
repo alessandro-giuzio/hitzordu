@@ -132,7 +132,7 @@ class BookingsController
    */
   public function is_timezone($value): bool
   {
-    return in_array($value, timezone_identifiers_list(), true);
+    return in_array($value, timezone_identifiers_list(\DateTimeZone::ALL_WITH_BC), true);
   }
 
   /**
