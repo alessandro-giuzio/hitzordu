@@ -69,6 +69,22 @@ class BookingsController
         ),
       )
     );
+
+    register_rest_route(
+      'hitzordu/v1',
+      '/bookings/cancel',
+      array(
+        'methods' => WP_REST_Server::CREATABLE,
+        'callback' => array($this, 'cancel_booking'),
+        'permission_callback' => '__return_true',
+        'args' => array(
+          'token' => array(
+            'required' => true,
+            'validate_callback' => array($this, 'is_cancel_token'),
+          ),
+        ),
+      )
+    );
   }
 
   /**
@@ -121,6 +137,16 @@ class BookingsController
   public function is_request_key($value): bool
   {
     return is_string($value) && 1 === preg_match('/^[a-z0-9_-]{8,64}$/i', $value);
+  }
+
+  /**
+   * A cancel token: exactly 64 lowercase hex characters.
+   *
+   * @param mixed $value Raw value.
+   */
+  public function is_cancel_token($value): bool
+  {
+    return is_string($value) && 1 === preg_match('/^[a-f0-9]{64}$/', $value);
   }
 
   /**
@@ -232,6 +258,51 @@ class BookingsController
       ),
       201
     );
+  }
+
+  /**
+   * Cancel the booking that owns the token, if it has not started yet.
+   *
+   * @param WP_REST_Request $request The validated request.
+   * @return WP_REST_Response|WP_Error
+   */
+  public function cancel_booking(WP_REST_Request $request)
+  {
+    global $wpdb;
+
+    $table = $wpdb->prefix . 'hitzordu_bookings';
+
+    $booking = $wpdb->get_row(
+      $wpdb->prepare(
+        "SELECT id, status, starts_at FROM {$table} WHERE cancel_token = %s",
+        $request['token']
+      )
+    );
+
+    if (!$booking) {
+      return new WP_Error('hitzordu_unknown_booking', __('Booking not found.', 'hitzordu'), array('status' => 404));
+    }
+
+    if ('cancelled' === $booking->status) {
+      return new WP_REST_Response(array('status' => 'already_cancelled'), 200);
+    }
+
+    $utc = new DateTimeZone('UTC');
+    $starts = new DateTimeImmutable($booking->starts_at, $utc);
+
+    if ($starts <= new DateTimeImmutable('now', $utc)) {
+      return new WP_REST_Response(array('status' => 'too_late'), 409);
+    }
+
+    $wpdb->update(
+      $table,
+      array('status' => 'cancelled'),
+      array('id' => (int) $booking->id),
+      array('%s'),
+      array('%d')
+    );
+
+    return new WP_REST_Response(array('status' => 'cancelled'), 200);
   }
 
   /**
