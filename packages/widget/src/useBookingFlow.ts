@@ -1,4 +1,5 @@
 import { computed, ref } from 'vue';
+import { addMonths, firstOfMonth, lastOfMonth } from './lib/calendar';
 import { endpoint, groupByDay, isoDate } from './lib/slots';
 
 export type Step =
@@ -21,6 +22,9 @@ export interface BookingFlowOptions {
   now?: () => Date;
 }
 
+/** How many months after the current one the visitor may browse. */
+const MONTHS_AHEAD = 2;
+
 function newKey(): string {
   return Array.from(crypto.getRandomValues(new Uint8Array(16)), byte =>
     byte.toString(16).padStart(2, '0'),
@@ -37,10 +41,17 @@ export function useBookingFlow(options: BookingFlowOptions) {
     options.locale ??
     (typeof navigator !== 'undefined' ? navigator.language : 'en');
 
+  const today = isoDate(now());
+  const minMonth = firstOfMonth(today);
+  const maxMonth = addMonths(minMonth, MONTHS_AHEAD);
+  const minDate = today;
+  const maxDate = lastOfMonth(maxMonth);
+
   const step = ref<Step>('pickDate');
   const loading = ref(false);
   const message = ref('');
   const slots = ref<string[]>([]);
+  const visibleMonth = ref(minMonth);
   const selectedDay = ref('');
   const selectedSlot = ref('');
   const name = ref('');
@@ -51,27 +62,39 @@ export function useBookingFlow(options: BookingFlowOptions) {
   const idempotencyKey = newKey();
 
   const days = computed(() => groupByDay(slots.value, timeZone));
+  const canGoPrev = computed(() => visibleMonth.value > minMonth);
+  const canGoNext = computed(() => visibleMonth.value < maxMonth);
 
   async function load(): Promise<void> {
+    const month = visibleMonth.value;
     loading.value = true;
     try {
-      const from = now();
-      const to = new Date(from);
-      to.setDate(to.getDate() + 14);
       const response = await fetchFn(
         endpoint(options.apiUrl, '/availability', {
           type: options.meetingType,
-          from: isoDate(from),
-          to: isoDate(to),
+          from: month < today ? today : month,
+          to: lastOfMonth(month),
         }),
       );
       if (!response.ok) throw new Error('Request failed');
-      slots.value = (await response.json()).slots;
+      const data = await response.json();
+      // Ignore a slow answer for a month the visitor has already left.
+      if (month === visibleMonth.value) slots.value = data.slots;
     } catch {
       message.value = 'Could not load available times. Please try again later.';
     } finally {
       loading.value = false;
     }
+  }
+
+  async function showMonth(date: string): Promise<void> {
+    const target = firstOfMonth(date);
+    const month =
+      target < minMonth ? minMonth : target > maxMonth ? maxMonth : target;
+    if (month === visibleMonth.value) return;
+    visibleMonth.value = month;
+    slots.value = [];
+    await load();
   }
 
   function chooseDay(day: string): void {
@@ -136,13 +159,21 @@ export function useBookingFlow(options: BookingFlowOptions) {
     loading,
     message,
     days,
+    visibleMonth,
     selectedDay,
     selectedSlot,
     name,
     email,
     notes,
     timeZone,
+    locale,
+    today,
+    minDate,
+    maxDate,
+    canGoPrev,
+    canGoNext,
     load,
+    showMonth,
     chooseDay,
     chooseSlot,
     back,
