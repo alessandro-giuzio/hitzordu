@@ -2,7 +2,7 @@
 /**
  * Fired when the plugin is deleted from the Plugins screen.
  *
- * Data is kept unless the option hitzordu_delete_data_on_uninstall is truthy.
+ * Data is kept unless the delete_data setting is on.
  *
  * @package Hitzordu
  */
@@ -11,7 +11,9 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
 
-if ( ! get_option( 'hitzordu_delete_data_on_uninstall' ) ) {
+$hitzordu_settings = get_option('hitzordu_settings', array());
+
+if (empty($hitzordu_settings['delete_data'])) {
 	return;
 }
 
@@ -25,4 +27,4 @@ foreach ( $hitzordu_tables as $hitzordu_table ) {
 }
 
 delete_option( 'hitzordu_db_version' );
-delete_option( 'hitzordu_delete_data_on_uninstall' );
+delete_option( 'hitzordu_settings' );

@@ -80,7 +80,7 @@ class Notifier
     );
 
     wp_mail(
-      get_option('admin_email'),
+      Settings::notification_email(),
       /* translators: 1: meeting type name, 2: visitor's name. */
       sprintf(__('New booking: %1$s with %2$s', 'hitzordu'), $booking->type_name, $booking->name),
       implode("\n", $host_lines)

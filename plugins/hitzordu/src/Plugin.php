@@ -22,6 +22,9 @@ class Plugin {
 		add_action( 'init', array( $this, 'register_shortcode' ) );
 		add_action( 'template_redirect', array( new CancelPage(), 'maybe_render' ) );
 		add_action('admin_menu', array(new Admin\BookingsPage(), 'register'));
+		$settings_page = new Admin\SettingsPage();
+		add_action('admin_menu', array($settings_page, 'register_menu'));
+		add_action('admin_init', array($settings_page, 'register_settings'));
 
 		$this->maybe_upgrade();
 	}
