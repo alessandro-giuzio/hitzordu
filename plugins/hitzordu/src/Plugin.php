@@ -21,6 +21,7 @@ class Plugin {
 		add_action( 'wp_enqueue_scripts', array( $this, 'register_assets' ) );
 		add_action( 'init', array( $this, 'register_shortcode' ) );
 		add_action( 'template_redirect', array( new CancelPage(), 'maybe_render' ) );
+		add_action('admin_menu', array(new Admin\BookingsPage(), 'register'));
 
 		$this->maybe_upgrade();
 	}
