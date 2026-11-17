@@ -25,6 +25,9 @@ class Plugin {
 		$settings_page = new Admin\SettingsPage();
 		add_action('admin_menu', array($settings_page, 'register_menu'));
 		add_action('admin_init', array($settings_page, 'register_settings'));
+		$hours_page = new Admin\HoursPage();
+		add_action('admin_menu', array($hours_page, 'register_menu'));
+		add_action('admin_post_' . Admin\HoursPage::ACTION, array($hours_page, 'save'));
 
 		$this->maybe_upgrade();
 	}
