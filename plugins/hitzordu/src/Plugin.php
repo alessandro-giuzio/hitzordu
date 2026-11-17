@@ -52,6 +52,7 @@ class Plugin {
 	public function register_rest_routes(): void
 	{
 		(new Rest\AvailabilityController())->register_routes();
+		(new Rest\BookingsController())->register_routes();
 	}
 
 	/**
