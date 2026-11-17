@@ -128,7 +128,7 @@ describe('useBookingFlow', () => {
     await flow.submit();
 
     expect(flow.step.value).toBe('pickDate');
-    expect(flow.message.value).toContain('just taken');
+    expect(flow.message.value).toContain('acaba de reservar');
     expect(fetchFn).toHaveBeenCalledTimes(3);
     expect(flow.days.value.get('2027-01-12')).toEqual([SLOTS[1]]);
   });

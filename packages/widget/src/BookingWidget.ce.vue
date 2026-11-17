@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, useId, watch } from 'vue';
-import CalendarGrid from './CalendarGrid.vue';
-import { parseIsoDate, weekStartForLocale } from './lib/calendar';
-import { useBookingFlow } from './useBookingFlow';
+import { computed, onMounted, ref, useId, watch } from 'vue'
+import CalendarGrid from './CalendarGrid.vue'
+import { parseIsoDate, weekStartForLocale } from './lib/calendar'
+import { useBookingFlow } from './useBookingFlow'
 
-const props = defineProps<{ apiUrl: string; meetingType: string }>();
+const props = defineProps<{ apiUrl: string; meetingType: string; locale?: string }>()
+
+// The page's language: WordPress sets <html lang> from the site language.
+const pageLocale =
+  props.locale || document.documentElement.lang || navigator.language || 'en'
 
 const {
   step,
@@ -24,69 +28,59 @@ const {
   maxDate,
   canGoPrev,
   canGoNext,
+  t,
   load,
   showMonth,
   chooseDay,
   chooseSlot,
   back,
   submit,
-} = useBookingFlow({ apiUrl: props.apiUrl, meetingType: props.meetingType });
+} = useBookingFlow({ apiUrl: props.apiUrl, meetingType: props.meetingType, locale: pageLocale })
 
-const weekStart = weekStartForLocale(locale);
-const timesId = useId();
+const weekStart = weekStartForLocale(locale)
+const timesId = useId()
 
-const dateFormat = new Intl.DateTimeFormat(locale, {
-  weekday: 'long',
-  day: 'numeric',
-  month: 'long',
-  timeZone: 'UTC',
-});
-const timeFormat = new Intl.DateTimeFormat(locale, {
-  hour: '2-digit',
-  minute: '2-digit',
-  timeZone,
-});
+const dateFormat = new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' })
+const timeFormat = new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit', timeZone })
 
 function dateLabel(day: string): string {
-  return day ? dateFormat.format(parseIsoDate(day)) : '';
+  return day ? dateFormat.format(parseIsoDate(day)) : ''
 }
 
 function timeLabel(slot: string): string {
-  return timeFormat.format(new Date(slot));
+  return timeFormat.format(new Date(slot))
 }
 
-const selectedTime = computed(() =>
-  selectedSlot.value ? timeLabel(selectedSlot.value) : '',
-);
+const selectedTime = computed(() => (selectedSlot.value ? timeLabel(selectedSlot.value) : ''))
 
 // Each step's heading and the error message can receive focus from script.
-const heading = ref<HTMLElement | null>(null);
-const alert = ref<HTMLElement | null>(null);
+const heading = ref<HTMLElement | null>(null)
+const alert = ref<HTMLElement | null>(null)
 
 watch(
   step,
   (current, previous) => {
-    if (current === 'submitting') return;
+    if (current === 'submitting') return
     if (previous === 'submitting' && current === 'details') {
-      alert.value?.focus();
-      return;
+      alert.value?.focus()
+      return
     }
-    heading.value?.focus();
+    heading.value?.focus()
   },
   { flush: 'post' },
-);
+)
 
-onMounted(load);
+onMounted(load)
 </script>
 
 <template>
-  <section class="hz" aria-label="Book a call">
+  <section class="hz" :aria-label="t('bookACall')">
     <p v-if="message" ref="alert" class="hz-alert" role="alert" tabindex="-1">
       {{ message }}
     </p>
 
     <div v-if="step === 'pickDate'">
-      <h3 ref="heading" class="hz-heading" tabindex="-1">Choose a day</h3>
+      <h3 ref="heading" class="hz-heading" tabindex="-1">{{ t('chooseDay') }}</h3>
       <CalendarGrid
         :month="visibleMonth"
         :days="days"
@@ -107,61 +101,39 @@ onMounted(load);
       <h3 :id="timesId" ref="heading" class="hz-heading" tabindex="-1">
         {{ dateLabel(selectedDay) }}
       </h3>
-      <p class="hz-muted">Times are shown in {{ timeZone }}.</p>
+      <p class="hz-muted">{{ t('timesShownIn', { zone: timeZone }) }}</p>
       <ul class="hz-times" role="list" :aria-labelledby="timesId">
         <li v-for="slot in days.get(selectedDay)" :key="slot">
-          <button
-            type="button"
-            class="hz-button hz-time"
-            part="button"
-            @click="chooseSlot(slot)">
+          <button type="button" class="hz-button hz-time" part="button" @click="chooseSlot(slot)">
             {{ timeLabel(slot) }}
           </button>
         </li>
       </ul>
       <div class="hz-actions">
         <button type="button" class="hz-button" part="button" @click="back">
-          Back to days
+          {{ t('backToDays') }}
         </button>
       </div>
     </div>
 
-    <form
-      v-else-if="step === 'details' || step === 'submitting'"
-      @submit.prevent="submit">
+    <form v-else-if="step === 'details' || step === 'submitting'" @submit.prevent="submit">
       <h3 ref="heading" class="hz-heading" tabindex="-1">
         {{ dateLabel(selectedDay) }}, {{ selectedTime }}
       </h3>
 
       <label class="hz-field">
-        <span>Name</span>
-        <input
-          v-model="name"
-          class="hz-input"
-          part="input"
-          required
-          maxlength="190"
-          autocomplete="name" />
+        <span>{{ t('name') }}</span>
+        <input v-model="name" class="hz-input" part="input" required maxlength="190" autocomplete="name" />
       </label>
 
       <label class="hz-field">
-        <span>Email</span>
-        <input
-          v-model="email"
-          class="hz-input"
-          part="input"
-          type="email"
-          required
-          autocomplete="email" />
+        <span>{{ t('email') }}</span>
+        <input v-model="email" class="hz-input" part="input" type="email" required autocomplete="email" />
       </label>
 
       <label class="hz-field">
-        <span>Notes <span class="hz-muted">(optional)</span></span>
-        <textarea
-          v-model="notes"
-          class="hz-input"
-          part="input"
-          rows="3"></textarea>
+        <span>{{ t('notes') }} <span class="hz-muted">{{ t('optional') }}</span></span>
+        <textarea v-model="notes" class="hz-input" part="input" rows="3"></textarea>
       </label>
 
       <div class="hz-actions">
@@ -170,7 +142,7 @@ onMounted(load);
           class="hz-button hz-button--primary"
           part="button"
           :disabled="step === 'submitting'">
-          {{ step === 'submitting' ? 'Booking…' : 'Confirm booking' }}
+          {{ step === 'submitting' ? t('booking') : t('confirmBooking') }}
         </button>
         <button
           type="button"
@@ -178,15 +150,15 @@ onMounted(load);
           part="button"
           :disabled="step === 'submitting'"
           @click="back">
-          Back to times
+          {{ t('backToTimes') }}
         </button>
       </div>
     </form>
 
     <div v-else>
-      <h3 ref="heading" class="hz-heading" tabindex="-1">You're booked</h3>
+      <h3 ref="heading" class="hz-heading" tabindex="-1">{{ t('booked') }}</h3>
       <p>{{ dateLabel(selectedDay) }}, {{ selectedTime }} ({{ timeZone }}).</p>
-      <p class="hz-muted">A confirmation email is on its way to {{ email }}.</p>
+      <p class="hz-muted">{{ t('emailOnItsWay', { email }) }}</p>
     </div>
   </section>
 </template>

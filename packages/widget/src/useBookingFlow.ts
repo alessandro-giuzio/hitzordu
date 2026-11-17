@@ -1,6 +1,7 @@
 import { computed, ref } from 'vue';
 import { addMonths, firstOfMonth, lastOfMonth } from './lib/calendar';
 import { endpoint, groupByDay, isoDate } from './lib/slots';
+import { createTranslator, type Translate } from './lib/i18n';
 
 export type Step =
   | 'pickDate'
@@ -11,6 +12,8 @@ export type Step =
 
 export interface BookingFlowOptions {
   apiUrl: string;
+  /** Message lookup. Defaults to the catalogue for the locale. */
+  t?: Translate;
   meetingType: string;
   /** Visitor's time zone. Defaults to the browser's. */
   timeZone?: string;
@@ -40,6 +43,7 @@ export function useBookingFlow(options: BookingFlowOptions) {
   const locale =
     options.locale ??
     (typeof navigator !== 'undefined' ? navigator.language : 'en');
+  const t = options.t ?? createTranslator(locale);
 
   const today = isoDate(now());
   const minMonth = firstOfMonth(today);
@@ -81,7 +85,7 @@ export function useBookingFlow(options: BookingFlowOptions) {
       // Ignore a slow answer for a month the visitor has already left.
       if (month === visibleMonth.value) slots.value = data.slots;
     } catch {
-      message.value = 'Could not load available times. Please try again later.';
+      message.value = t('loadFailed');
     } finally {
       loading.value = false;
     }
@@ -139,17 +143,16 @@ export function useBookingFlow(options: BookingFlowOptions) {
       }
 
       if (response.status === 409) {
-        message.value =
-          'Sorry, that time was just taken. Please choose another.';
+        message.value = t('slotTaken');
         await load();
         step.value = 'pickDate';
         return;
       }
 
-      message.value = data.message ?? 'Something went wrong. Please try again.';
+      message.value = data.message ?? t('genericError');
       step.value = 'details';
     } catch {
-      message.value = 'Could not reach the server. Please try again.';
+      message.value = t('networkError');
       step.value = 'details';
     }
   }
@@ -167,6 +170,7 @@ export function useBookingFlow(options: BookingFlowOptions) {
     notes,
     timeZone,
     locale,
+    t,
     today,
     minDate,
     maxDate,

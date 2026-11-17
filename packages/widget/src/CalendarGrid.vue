@@ -8,6 +8,7 @@ import {
   moveByKey,
   parseIsoDate,
 } from './lib/calendar';
+import { createTranslator } from './lib/i18n';
 
 const props = defineProps<{
   month: string;
@@ -27,6 +28,8 @@ const emit = defineEmits<{
   select: [day: string];
   changeMonth: [date: string];
 }>();
+
+const t = computed(() => createTranslator(props.locale));
 
 const titleId = useId();
 const grid = ref<HTMLTableElement | null>(null);
@@ -81,20 +84,20 @@ function isAvailable(day: string): boolean {
 }
 
 const statusText = computed(() => {
-  if (props.loading) return 'Loading available times…';
+  if (props.loading) return t.value('loadingTimes');
   const prefix = props.month.slice(0, 7);
   const count = [...props.days.keys()].filter(
-    day => day.startsWith(prefix) && isAvailable(day),
+    (day) => day.startsWith(prefix) && isAvailable(day),
   ).length;
-  if (count === 0) return `${monthTitle.value}: no available times.`;
-  return `${monthTitle.value}: ${count} ${count === 1 ? 'day' : 'days'} with available times.`;
+  if (count === 0) return t.value('monthNone', { month: monthTitle.value });
+  return t.value('monthDays', { month: monthTitle.value, count });
 });
 
 function label(day: string): string {
   const date = fullDateFormat.value.format(parseIsoDate(day));
-  if (!isAvailable(day)) return `${date}, not available`;
+  if (!isAvailable(day)) return t.value('dayUnavailable', { date });
   const count = props.days.get(day)?.length ?? 0;
-  return `${date}, ${count} ${count === 1 ? 'time' : 'times'} available`;
+  return t.value('dayTimes', { date, count });
 }
 
 /** Which day gets the single tab stop when the month is shown. */
@@ -180,7 +183,7 @@ function pick(day: string): void {
         type="button"
         class="hz-button hz-nav"
         part="button"
-        aria-label="Previous month"
+        :aria-label="t('previousMonth')"
         :disabled="!canGoPrev"
         @click="emit('changeMonth', addMonths(month, -1))">
         ‹
@@ -190,7 +193,7 @@ function pick(day: string): void {
         type="button"
         class="hz-button hz-nav"
         part="button"
-        aria-label="Next month"
+        :aria-label="t('nextMonth')"
         :disabled="!canGoNext"
         @click="emit('changeMonth', addMonths(month, 1))">
         ›
