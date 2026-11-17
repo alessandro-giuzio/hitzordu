@@ -10,6 +10,7 @@ namespace Hitzordu\Plugin\Rest;
 use DateTimeImmutable;
 use DateTimeZone;
 use Hitzordu\Plugin\Availability;
+use Hitzordu\Plugin\Cancellation;
 use Hitzordu\Plugin\Notifier;
 use Hitzordu\Plugin\RateLimiter;
 use WP_Error;
@@ -296,41 +297,13 @@ class BookingsController
    */
   public function cancel_booking(WP_REST_Request $request)
   {
-    global $wpdb;
+    $result = (new Cancellation())->cancel($request['token']);
 
-    $table = $wpdb->prefix . 'hitzordu_bookings';
-
-    $booking = $wpdb->get_row(
-      $wpdb->prepare(
-        "SELECT id, status, starts_at FROM {$table} WHERE cancel_token = %s",
-        $request['token']
-      )
-    );
-
-    if (!$booking) {
+    if ('not_found' === $result) {
       return new WP_Error('hitzordu_unknown_booking', __('Booking not found.', 'hitzordu'), array('status' => 404));
     }
 
-    if ('cancelled' === $booking->status) {
-      return new WP_REST_Response(array('status' => 'already_cancelled'), 200);
-    }
-
-    $utc = new DateTimeZone('UTC');
-    $starts = new DateTimeImmutable($booking->starts_at, $utc);
-
-    if ($starts <= new DateTimeImmutable('now', $utc)) {
-      return new WP_REST_Response(array('status' => 'too_late'), 409);
-    }
-
-    $wpdb->update(
-      $table,
-      array('status' => 'cancelled'),
-      array('id' => (int) $booking->id),
-      array('%s'),
-      array('%d')
-    );
-
-    return new WP_REST_Response(array('status' => 'cancelled'), 200);
+    return new WP_REST_Response(array('status' => $result), 'too_late' === $result ? 409 : 200);
   }
 
   /**

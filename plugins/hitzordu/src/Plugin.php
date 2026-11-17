@@ -20,6 +20,7 @@ class Plugin {
 		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'register_assets' ) );
 		add_action( 'init', array( $this, 'register_shortcode' ) );
+		add_action( 'template_redirect', array( new CancelPage(), 'maybe_render' ) );
 
 		$this->maybe_upgrade();
 	}
