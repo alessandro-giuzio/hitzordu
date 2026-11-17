@@ -37,4 +37,32 @@ final class SlotGenerator
 
     return $slots;
   }
+
+  /**
+   * Drop slots that overlap any busy period.
+   *
+   * @param list<DateTimeImmutable>                                 $slots Slot starts.
+   * @param list<array{0: DateTimeImmutable, 1: DateTimeImmutable}> $busy  Start and end pairs.
+   *
+   * @return list<DateTimeImmutable>
+   */
+  public function removeBusy(array $slots, int $durationMinutes, array $busy): array
+  {
+    $free = array_filter(
+      $slots,
+      function (DateTimeImmutable $slot) use ($durationMinutes, $busy): bool {
+        $slotEnd = $slot->modify("+{$durationMinutes} minutes");
+
+        foreach ($busy as [$busyStart, $busyEnd]) {
+          if ($slot < $busyEnd && $slotEnd > $busyStart) {
+            return false;
+          }
+        }
+
+        return true;
+      }
+    );
+
+    return array_values($free);
+  }
 }
