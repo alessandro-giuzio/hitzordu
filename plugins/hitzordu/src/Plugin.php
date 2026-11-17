@@ -86,19 +86,36 @@ class Plugin {
 	}
 
 	/**
-	 * Print the widget placeholder and ask WordPress to load the script.
+	 * Print the widget element and ask WordPress to load the script.
 	 *
 	 * @param array|string $atts Shortcode attributes.
 	 */
-	public function render_shortcode( $atts ): string {
-		$atts = shortcode_atts( array( 'type' => 'discovery-call' ), $atts, 'hitzordu' );
+	public function render_shortcode($atts): string
+	{
+		$atts = shortcode_atts(
+			array(
+				'type' => 'discovery-call',
+				'contact' => '',
+			),
+			$atts,
+			'hitzordu'
+		);
 
-		wp_enqueue_script_module( 'hitzordu-widget' );
+		wp_enqueue_script_module('hitzordu-widget');
+
+		$fallback = esc_html__('The booking calendar needs JavaScript to work.', 'hitzordu');
+
+		if ('' !== $atts['contact']) {
+			$fallback .= ' <a href="' . esc_url($atts['contact']) . '">'
+				. esc_html__('Contact us to arrange a call instead.', 'hitzordu')
+				. '</a>';
+		}
 
 		return sprintf(
-			'<div data-hitzordu-widget data-api-url="%1$s" data-meeting-type="%2$s"></div>',
-			esc_url( rest_url( 'hitzordu/v1' ) ),
-			esc_attr( sanitize_key( $atts['type'] ) )
+			'<hitzordu-widget api-url="%1$s" meeting-type="%2$s"><noscript><p>%3$s</p></noscript></hitzordu-widget>',
+			esc_url(rest_url('hitzordu/v1')),
+			esc_attr(sanitize_key($atts['type'])),
+			$fallback // Each part is escaped above.
 		);
 	}
 }

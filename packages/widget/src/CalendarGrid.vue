@@ -116,6 +116,12 @@ function focusDay(day: string): void {
     ?.focus();
 }
 
+/** Whether focus is inside the grid. Asks the shadow root, which knows the real focused element. */
+function gridHasFocus(): boolean {
+  const root = grid.value?.getRootNode() as Document | ShadowRoot | undefined;
+  return Boolean(root && grid.value?.contains(root.activeElement));
+}
+
 watch(
   () => props.month,
   async () => {
@@ -134,8 +140,7 @@ watch(
   () => props.days,
   () => {
     // New availability arrived; only move the tab stop if the visitor is not in the grid.
-    if (!grid.value?.contains(document.activeElement))
-      focused.value = initialFocus();
+    if (!gridHasFocus()) focused.value = initialFocus();
   },
 );
 
@@ -166,39 +171,25 @@ function pick(day: string): void {
   focused.value = day;
   if (isAvailable(day)) emit('select', day);
 }
-
-function dayStyle(day: string): Record<string, string> {
-  const decorations: string[] = [];
-  if (!isAvailable(day)) decorations.push('line-through');
-  if (day === props.today) decorations.push('underline');
-
-  return {
-    minWidth: '2.75rem',
-    minHeight: '2.75rem',
-    textDecoration: decorations.join(' ') || 'none',
-    opacity: isAvailable(day) ? '1' : '0.45',
-    fontWeight: day === props.selected ? '700' : '400',
-    border:
-      day === props.selected
-        ? '2px solid currentColor'
-        : '1px solid transparent',
-  };
-}
 </script>
 
 <template>
   <div>
-    <div style="display: flex; align-items: center; gap: 0.5rem">
+    <div class="hz-month">
       <button
         type="button"
+        class="hz-button hz-nav"
+        part="button"
         aria-label="Previous month"
         :disabled="!canGoPrev"
         @click="emit('changeMonth', addMonths(month, -1))">
         ‹
       </button>
-      <h4 :id="titleId" style="margin: 0">{{ monthTitle }}</h4>
+      <h4 :id="titleId" class="hz-month-title">{{ monthTitle }}</h4>
       <button
         type="button"
+        class="hz-button hz-nav"
+        part="button"
         aria-label="Next month"
         :disabled="!canGoNext"
         @click="emit('changeMonth', addMonths(month, 1))">
@@ -206,10 +197,11 @@ function dayStyle(day: string): Record<string, string> {
       </button>
     </div>
 
-    <p role="status">{{ statusText }}</p>
+    <p class="hz-muted" role="status">{{ statusText }}</p>
 
     <table
       ref="grid"
+      class="hz-grid"
       role="grid"
       :aria-labelledby="titleId"
       @keydown="onKeydown">
@@ -229,12 +221,15 @@ function dayStyle(day: string): Record<string, string> {
             <button
               v-if="day"
               type="button"
+              class="hz-day"
+              part="day"
               :data-date="day"
+              :data-available="isAvailable(day) || undefined"
+              :data-selected="day === selected || undefined"
               :tabindex="day === focused ? 0 : -1"
               :aria-label="label(day)"
               :aria-disabled="isAvailable(day) ? undefined : 'true'"
               :aria-current="day === today ? 'date' : undefined"
-              :style="dayStyle(day)"
               @click="pick(day)">
               {{ Number(day.slice(8)) }}
             </button>

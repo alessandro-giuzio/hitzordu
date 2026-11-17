@@ -1,9 +1,9 @@
-import { createApp } from 'vue'
-import BookingWidget from './BookingWidget.vue'
+import { defineCustomElement } from 'vue';
+import BookingWidget from './BookingWidget.ce.vue';
 
-document.querySelectorAll<HTMLElement>('[data-hitzordu-widget]').forEach((el) => {
-  createApp(BookingWidget, {
-    apiUrl: el.dataset.apiUrl ?? '',
-    meetingType: el.dataset.meetingType ?? '',
-  }).mount(el)
-})
+const HitzorduWidget = defineCustomElement(BookingWidget);
+
+// Guard against the script being loaded twice on one page.
+if (!customElements.get('hitzordu-widget')) {
+  customElements.define('hitzordu-widget', HitzorduWidget);
+}
