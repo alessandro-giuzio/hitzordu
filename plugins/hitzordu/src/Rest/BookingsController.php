@@ -10,6 +10,8 @@ namespace Hitzordu\Plugin\Rest;
 use DateTimeImmutable;
 use DateTimeZone;
 use Hitzordu\Plugin\Availability;
+use Hitzordu\Plugin\Notifier;
+use Hitzordu\Plugin\RateLimiter;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -65,6 +67,10 @@ class BookingsController
             'required' => true,
             'validate_callback' => array($this, 'is_request_key'),
             'sanitize_callback' => 'sanitize_key',
+          ),
+          'website' => array(
+            'default' => '',
+            'sanitize_callback' => 'sanitize_text_field',
           ),
         ),
       )
@@ -157,6 +163,17 @@ class BookingsController
    */
   public function create_booking(WP_REST_Request $request)
   {
+    // Honeypot: real visitors never see or fill this field. Pretend it worked.
+    if ('' !== $request['website']) {
+      return new WP_REST_Response(
+        array(
+          'status' => 'confirmed',
+          'id' => 0,
+        ),
+        200
+      );
+    }
+
     global $wpdb;
 
     $prefix = $wpdb->prefix . 'hitzordu_';
@@ -187,6 +204,15 @@ class BookingsController
           'id' => (int) $existing,
         ),
         200
+      );
+    }
+
+    // At most 5 booking attempts per visitor every 10 minutes.
+    if ((new RateLimiter())->too_many('book', 5, 10 * MINUTE_IN_SECONDS)) {
+      return new WP_Error(
+        'hitzordu_rate_limited',
+        __('Too many attempts. Please try again in a few minutes.', 'hitzordu'),
+        array('status' => 429)
       );
     }
 
@@ -250,6 +276,8 @@ class BookingsController
     if (0 === $booking_id) {
       return new WP_Error('hitzordu_not_saved', __('The booking could not be saved.', 'hitzordu'), array('status' => 500));
     }
+
+    (new Notifier())->booking_confirmed($booking_id);
 
     return new WP_REST_Response(
       array(
