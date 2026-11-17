@@ -66,3 +66,31 @@ it('removes every slot touched by a longer busy period', function () {
 
   expect(array_map(fn($slot) => $slot->format('H:i'), $free))->toBe(['09:30']);
 });
+
+it('keeps a buffer clear on both sides of a busy period', function () {
+  $generator = new SlotGenerator();
+  $slots = $generator->forDay('2027-01-12', '09:00:00', '12:00:00', 30, new DateTimeZone('Europe/Madrid'));
+
+  // Busy 10:00 to 10:30 in Madrid, which is 09:00 to 09:30 UTC.
+  $busy = [
+    [new DateTimeImmutable('2027-01-12T09:00:00Z'), new DateTimeImmutable('2027-01-12T09:30:00Z')],
+  ];
+
+  $free = $generator->removeBusy($slots, 30, $busy, 15);
+
+  expect(array_map(fn($slot) => $slot->format('H:i'), $free))
+    ->toBe(['08:00', '10:00', '10:30']);
+});
+
+it('keeps only slots between the earliest and latest allowed times', function () {
+  $generator = new SlotGenerator();
+  $slots = $generator->forDay('2027-01-12', '09:00:00', '12:00:00', 30, new DateTimeZone('Europe/Madrid'));
+
+  $kept = $generator->withinWindow(
+    $slots,
+    new DateTimeImmutable('2027-01-12T09:00:00Z'),
+    new DateTimeImmutable('2027-01-12T10:00:00Z')
+  );
+
+  expect(array_map(fn($slot) => $slot->format('H:i'), $kept))->toBe(['09:00', '09:30']);
+});

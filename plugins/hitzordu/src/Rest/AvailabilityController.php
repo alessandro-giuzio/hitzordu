@@ -74,7 +74,7 @@ class AvailabilityController
 
     $type = $wpdb->get_row(
       $wpdb->prepare(
-        "SELECT id, duration_minutes FROM {$prefix}meeting_types WHERE slug = %s AND active = 1",
+        "SELECT id, duration_minutes, buffer_minutes, min_notice_minutes, window_days FROM {$prefix}meeting_types WHERE slug = %s AND active = 1",
         $request['type']
       )
     );
@@ -101,7 +101,7 @@ class AvailabilityController
 
     $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
     $slots = array();
-    $free = (new Availability())->free_slots((int) $type->duration_minutes, $from, $to);
+    $free = (new Availability())->free_slots($type, $from, $to);
 
     foreach ($free as $slot) {
       $slots[] = $slot->format('Y-m-d\TH:i:s\Z');
@@ -112,6 +112,9 @@ class AvailabilityController
         'now' => $now->format('Y-m-d\TH:i:s\Z'),
         'hostTimeZone' => $zone->getName(),
         'durationMinutes' => (int) $type->duration_minutes,
+        'bufferMinutes' => (int) $type->buffer_minutes,
+        'minNoticeMinutes' => (int) $type->min_notice_minutes,
+        'windowDays' => (int) $type->window_days,
         'slots' => $slots,
       )
     );

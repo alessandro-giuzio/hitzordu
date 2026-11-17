@@ -46,15 +46,26 @@ final class SlotGenerator
    *
    * @return list<DateTimeImmutable>
    */
-  public function removeBusy(array $slots, int $durationMinutes, array $busy): array
+  /**
+   * Drop slots that overlap any busy period, keeping a buffer clear on both sides.
+   *
+   * @param list<DateTimeImmutable>                                 $slots Slot starts.
+   * @param list<array{0: DateTimeImmutable, 1: DateTimeImmutable}> $busy  Start and end pairs.
+   *
+   * @return list<DateTimeImmutable>
+   */
+  public function removeBusy(array $slots, int $durationMinutes, array $busy, int $bufferMinutes = 0): array
   {
     $free = array_filter(
       $slots,
-      function (DateTimeImmutable $slot) use ($durationMinutes, $busy): bool {
+      function (DateTimeImmutable $slot) use ($durationMinutes, $busy, $bufferMinutes): bool {
         $slotEnd = $slot->modify("+{$durationMinutes} minutes");
 
         foreach ($busy as [$busyStart, $busyEnd]) {
-          if ($slot < $busyEnd && $slotEnd > $busyStart) {
+          $blockedFrom = $busyStart->modify("-{$bufferMinutes} minutes");
+          $blockedUntil = $busyEnd->modify("+{$bufferMinutes} minutes");
+
+          if ($slot < $blockedUntil && $slotEnd > $blockedFrom) {
             return false;
           }
         }
@@ -64,5 +75,22 @@ final class SlotGenerator
     );
 
     return array_values($free);
+  }
+
+  /**
+   * Keep slots that start at or after $earliest and before $latest.
+   *
+   * @param list<DateTimeImmutable> $slots Slot starts.
+   *
+   * @return list<DateTimeImmutable>
+   */
+  public function withinWindow(array $slots, DateTimeImmutable $earliest, DateTimeImmutable $latest): array
+  {
+    return array_values(
+      array_filter(
+        $slots,
+        fn(DateTimeImmutable $slot): bool => $slot >= $earliest && $slot < $latest
+      )
+    );
   }
 }

@@ -181,7 +181,7 @@ class BookingsController
 
     $type = $wpdb->get_row(
       $wpdb->prepare(
-        "SELECT id, duration_minutes FROM {$prefix}meeting_types WHERE slug = %s AND active = 1",
+        "SELECT id, duration_minutes, buffer_minutes, min_notice_minutes, window_days FROM {$prefix}meeting_types WHERE slug = %s AND active = 1",
         $request['type']
       )
     );
@@ -222,7 +222,7 @@ class BookingsController
     $end = $start->modify("+{$duration} minutes");
 
     // The client may only book a slot the server would have offered.
-    if (!$this->is_offered_slot($start, $duration)) {
+    if (!$this->is_offered_slot($start, $type)) {
       return new WP_Error('hitzordu_not_a_slot', __('That time is not available.', 'hitzordu'), array('status' => 400));
     }
 
@@ -233,11 +233,14 @@ class BookingsController
       return new WP_Error('hitzordu_busy', __('Please try again in a moment.', 'hitzordu'), array('status' => 503));
     }
 
+    // The buffer keeps a gap free on both sides of every existing booking.
+    $buffer = (int) $type->buffer_minutes;
+
     $overlaps = (int) $wpdb->get_var(
       $wpdb->prepare(
         "SELECT COUNT(*) FROM {$prefix}bookings WHERE status = 'confirmed' AND starts_at < %s AND ends_at > %s",
-        $end->format('Y-m-d H:i:s'),
-        $start->format('Y-m-d H:i:s')
+        $end->modify("+{$buffer} minutes")->format('Y-m-d H:i:s'),
+        $start->modify("-{$buffer} minutes")->format('Y-m-d H:i:s')
       )
     );
 
@@ -307,16 +310,16 @@ class BookingsController
   }
 
   /**
-   * Whether the instant is a future slot generated from the working hours.
+   * Whether the instant is a slot the hours, overrides, notice and window allow.
    *
-   * @param DateTimeImmutable $start    Requested start, in UTC.
-   * @param int               $duration Meeting length in minutes.
+   * @param DateTimeImmutable $start Requested start, in UTC.
+   * @param object            $type  Meeting type row.
    */
-  private function is_offered_slot(DateTimeImmutable $start, int $duration): bool
+  private function is_offered_slot(DateTimeImmutable $start, object $type): bool
   {
     $day = $start->setTimezone(wp_timezone())->setTime(0, 0);
 
-    foreach ((new Availability())->grid_slots($duration, $day, $day) as $slot) {
+    foreach ((new Availability())->grid_slots($type, $day, $day) as $slot) {
       if ($slot->getTimestamp() === $start->getTimestamp()) {
         return true;
       }
