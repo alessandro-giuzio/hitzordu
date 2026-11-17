@@ -1,0 +1,383 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Hitzordu 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/hitzordu\n"
+"POT-Creation-Date: 2026-11-17T11:02:07+00:00\n"
+"PO-Revision-Date: 2026-11-17 11:04+0000\n"
+"Last-Translator: Alessandro Giuzio\n"
+"Language-Team: Basque\n"
+"Language: eu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Domain: hitzordu\n"
+"X-Generator: WP-CLI 2.12.0\n"
+
+#. Plugin Name of the plugin
+#: plugin.php src/Admin/BookingsPage.php:26
+msgid "Hitzordu"
+msgstr "Hitzordu"
+
+#. Plugin URI of the plugin
+#: plugin.php
+msgid "https://agencyga.es"
+msgstr "https://agencyga.es"
+
+#. Description of the plugin
+#: plugin.php
+msgid "Appointment and call booking for WordPress."
+msgstr "WordPress-erako hitzordu eta dei erreserbak."
+
+#. Author of the plugin
+#: plugin.php
+msgid "Alessandro Giuzio"
+msgstr "Alessandro Giuzio"
+
+#. Author URI of the plugin
+#: plugin.php
+msgid "https://www.giuz.io/"
+msgstr "https://www.giuz.io/"
+
+#: plugin.php:39
+msgid "Hitzordu: dependencies are missing. Run \"composer install\" in the plugin folder."
+msgstr "Hitzordu: menpekotasunak falta dira. Exekutatu \"composer install\" pluginaren karpetan."
+
+#: src/Admin/BookingsPage.php:25 src/Admin/BookingsPage.php:37
+msgid "Hitzordu Bookings"
+msgstr "Hitzordu erreserbak"
+
+#: src/Admin/BookingsPage.php:38
+msgid "Bookings"
+msgstr "Erreserbak"
+
+#: src/Admin/BookingsPage.php:71
+msgid "Confirmed"
+msgstr "Baieztatua"
+
+#: src/Admin/BookingsPage.php:72
+msgid "Cancelled"
+msgstr "Bertan behera utzia"
+
+#: src/Admin/BookingsPage.php:76
+msgid "Upcoming bookings"
+msgstr "Hurrengo erreserbak"
+
+#. translators: %s: the site's time zone, e.g. Europe/Madrid.
+#: src/Admin/BookingsPage.php:80
+#, php-format
+msgid "Times are shown in %s."
+msgstr "Orduak %s ordu-zonan erakusten dira."
+
+#: src/Admin/BookingsPage.php:87
+msgid "When"
+msgstr "Noiz"
+
+#: src/Admin/BookingsPage.php:88
+msgid "Meeting"
+msgstr "Bilera"
+
+#: src/Admin/BookingsPage.php:89
+msgid "Name"
+msgstr "Izena"
+
+#: src/Admin/BookingsPage.php:90
+msgid "Email"
+msgstr "Helbide elektronikoa"
+
+#: src/Admin/BookingsPage.php:91
+msgid "Notes"
+msgstr "Oharrak"
+
+#: src/Admin/BookingsPage.php:92
+msgid "Status"
+msgstr "Egoera"
+
+#: src/Admin/BookingsPage.php:98
+msgid "No upcoming bookings."
+msgstr "Ez dago hurrengo erreserbarik."
+
+#: src/Admin/HoursPage.php:30 src/Admin/HoursPage.php:80
+msgid "Working Hours"
+msgstr "Lan-ordutegia"
+
+#: src/Admin/HoursPage.php:31
+msgid "Working hours"
+msgstr "Lan-ordutegia"
+
+#: src/Admin/HoursPage.php:86
+msgid "Working hours saved."
+msgstr "Ordutegia gorde da."
+
+#: src/Admin/HoursPage.php:92
+msgid "Nothing was saved: each open day needs a start time earlier than its end time."
+msgstr "Ez da ezer gorde: egun ireki bakoitzak amaiera-ordua baino lehenagoko hasiera-ordua behar du."
+
+#. translators: %s: the site's time zone, e.g. Europe/Madrid.
+#: src/Admin/HoursPage.php:100
+#, php-format
+msgid "Times are in %s. Changes do not affect bookings already made."
+msgstr "Orduak %s ordu-zonan daude. Aldaketek ez diete eragiten dagoeneko egindako erreserbei."
+
+#: src/Admin/HoursPage.php:124
+msgid "Open"
+msgstr "Irekita"
+
+#: src/Admin/HoursPage.php:128
+msgid "from"
+msgstr "hasiera"
+
+#: src/Admin/HoursPage.php:133
+msgid "to"
+msgstr "amaiera"
+
+#: src/Admin/HoursPage.php:143
+msgid "Save working hours"
+msgstr "Gorde ordutegia"
+
+#: src/Admin/HoursPage.php:158
+msgid "You are not allowed to do this."
+msgstr "Ez duzu hau egiteko baimenik."
+
+#: src/Admin/HoursPage.php:166
+msgid "The link you followed has expired. Please go back and try again."
+msgstr "Jarraitu duzun estekak iraungi du. Itzuli atzera eta saiatu berriro."
+
+#: src/Admin/SettingsPage.php:27 src/Admin/SettingsPage.php:151
+msgid "Hitzordu Settings"
+msgstr "Hitzordu ezarpenak"
+
+#: src/Admin/SettingsPage.php:28
+msgid "Settings"
+msgstr "Ezarpenak"
+
+#: src/Admin/SettingsPage.php:52
+msgid "General"
+msgstr "Orokorra"
+
+#: src/Admin/SettingsPage.php:59
+msgid "Notification email"
+msgstr "Jakinarazpenetarako helbide elektronikoa"
+
+#: src/Admin/SettingsPage.php:68
+msgid "Uninstall"
+msgstr "Desinstalazioa"
+
+#: src/Admin/SettingsPage.php:80
+msgid "How Hitzordu notifies you and what happens to its data."
+msgstr "Hitzorduk nola jakinarazten dizun eta bere datuekin zer gertatzen den."
+
+#: src/Admin/SettingsPage.php:95
+msgid "Where new booking emails go. Leave empty to use the site admin email."
+msgstr "Erreserba berrien mezuak nora bidaltzen diren. Utzi hutsik gunearen administratzailearen helbidea erabiltzeko."
+
+#: src/Admin/SettingsPage.php:107
+msgid "Delete all bookings and settings when the plugin is deleted"
+msgstr "Ezabatu erreserba eta ezarpen guztiak plugina ezabatzean"
+
+#: src/Admin/SettingsPage.php:129
+msgid "The notification email is not valid, so the previous one was kept."
+msgstr "Jakinarazpenetarako helbidea ez da baliozkoa; aurrekoa mantendu da."
+
+#: src/CancelPage.php:36
+msgid "Booking cancelled"
+msgstr "Erreserba bertan behera utzi da"
+
+#: src/CancelPage.php:36
+msgid "Your booking has been cancelled. The time is free again."
+msgstr "Zure erreserba bertan behera utzi da. Ordua libre dago berriro."
+
+#: src/CancelPage.php:40
+msgid "Already cancelled"
+msgstr "Dagoeneko bertan behera utzia"
+
+#: src/CancelPage.php:40
+msgid "This booking was already cancelled."
+msgstr "Erreserba hau dagoeneko bertan behera utzita zegoen."
+
+#: src/CancelPage.php:44
+msgid "Too late to cancel"
+msgstr "Beranduegi bertan behera uzteko"
+
+#: src/CancelPage.php:44
+msgid "This booking has already started or passed."
+msgstr "Erreserba hau dagoeneko hasi edo amaitu da."
+
+#: src/CancelPage.php:52
+msgid "Booking not found"
+msgstr "Ez da erreserba aurkitu"
+
+#: src/CancelPage.php:52
+msgid "This cancel link is not valid."
+msgstr "Bertan behera uzteko esteka hau ez da baliozkoa."
+
+#: src/CancelPage.php:66
+msgid "Cancel this booking?"
+msgstr "Erreserba hau bertan behera utzi?"
+
+#: src/CancelPage.php:69
+msgid "Yes, cancel my booking"
+msgstr "Bai, utzi bertan behera nire erreserba"
+
+#: src/CancelPage.php:72
+msgid "Cancel booking"
+msgstr "Utzi erreserba bertan behera"
+
+#. translators: %s: visitor's name.
+#: src/Notifier.php:48
+#, php-format
+msgid "Hi %s,"
+msgstr "Kaixo, %s:"
+
+#. translators: 1: meeting type name, 2: site name.
+#: src/Notifier.php:51
+#, php-format
+msgid "Your %1$s with %2$s is confirmed."
+msgstr "Baieztatuta dago zure erreserba: %1$s, %2$s."
+
+#. translators: %s: date and time with time zone.
+#: src/Notifier.php:54 src/Notifier.php:78
+#, php-format
+msgid "When: %s"
+msgstr "Noiz: %s"
+
+#. translators: %d: meeting length in minutes.
+#: src/Notifier.php:57
+#, php-format
+msgid "Length: %d minute"
+msgid_plural "Length: %d minutes"
+msgstr[0] "Iraupena: %d minutu"
+msgstr[1] "Iraupena: %d minutu"
+
+#: src/Notifier.php:61
+msgid "Need to cancel? Use this link:"
+msgstr "Bertan behera utzi behar duzu? Erabili esteka hau:"
+
+#. translators: 1: meeting type name, 2: site name.
+#: src/Notifier.php:68
+#, php-format
+msgid "Confirmed: %1$s with %2$s"
+msgstr "Erreserba baieztatua: %1$s, %2$s"
+
+#. translators: %s: meeting type name.
+#: src/Notifier.php:75
+#, php-format
+msgid "New booking: %s"
+msgstr "Erreserba berria: %s"
+
+#. translators: 1: visitor's name, 2: visitor's email address.
+#: src/Notifier.php:80
+#, php-format
+msgid "Who: %1$s (%2$s)"
+msgstr "Nor: %1$s (%2$s)"
+
+#. translators: %s: notes left by the visitor.
+#: src/Notifier.php:82
+#, php-format
+msgid "Notes: %s"
+msgstr "Oharrak: %s"
+
+#. translators: 1: meeting type name, 2: visitor's name.
+#: src/Notifier.php:88
+#, php-format
+msgid "New booking: %1$s with %2$s"
+msgstr "Erreserba berria: %1$s, %2$s"
+
+#: src/Plugin.php:125
+msgid "The booking calendar needs JavaScript to work."
+msgstr "Erreserba-egutegiak JavaScript behar du funtzionatzeko."
+
+#: src/Plugin.php:129
+msgid "Contact us to arrange a call instead."
+msgstr "Jarri gurekin harremanetan dei bat adosteko."
+
+#: src/Rest/AvailabilityController.php:85 src/Rest/BookingsController.php:190
+msgid "Unknown meeting type."
+msgstr "Bilera mota ezezaguna."
+
+#: src/Rest/AvailabilityController.php:97
+msgid "The date range is invalid or longer than 62 days."
+msgstr "Data-tartea ez da baliozkoa edo 62 egun baino luzeagoa da."
+
+#: src/Rest/BookingsController.php:215
+msgid "Too many attempts. Please try again in a few minutes."
+msgstr "Saiakera gehiegi. Saiatu berriro minutu batzuk barru."
+
+#: src/Rest/BookingsController.php:226
+msgid "That time is not available."
+msgstr "Ordu hori ez dago libre."
+
+#: src/Rest/BookingsController.php:233
+msgid "Please try again in a moment."
+msgstr "Saiatu berriro une batean."
+
+#: src/Rest/BookingsController.php:281
+msgid "The booking could not be saved."
+msgstr "Ezin izan da erreserba gorde."
+
+#: src/Rest/BookingsController.php:306
+msgid "Booking not found."
+msgstr "Ez da erreserba aurkitu."
+
+#. translators: 1: meeting type name, 2: length in minutes.
+#: blocks/booking/editor.js:24
+#, js-format
+msgid "Visitors will book: %1$s (%2$d minute). The calendar appears on the published page."
+msgid_plural "Visitors will book: %1$s (%2$d minutes). The calendar appears on the published page."
+msgstr[0] "Bisitariek hau erreserbatuko dute: %1$s (%2$d minutu). Egutegia argitaratutako orrian agertzen da."
+msgstr[1] "Bisitariek hau erreserbatuko dute: %1$s (%2$d minutu). Egutegia argitaratutako orrian agertzen da."
+
+#: blocks/booking/editor.js:33
+msgid "Choose a meeting type in the block settings."
+msgstr "Aukeratu bilera mota bat blokearen ezarpenetan."
+
+#: blocks/booking/editor.js:43
+msgid "Booking settings"
+msgstr "Erreserba-ezarpenak"
+
+#: blocks/booking/editor.js:45
+msgid "Meeting type"
+msgstr "Bilera mota"
+
+#: blocks/booking/editor.js:53
+msgid "Fallback contact URL"
+msgstr "Ordezko harremanetarako URLa"
+
+#: blocks/booking/editor.js:54
+msgid "Shown to visitors who have JavaScript turned off."
+msgstr "JavaScript desaktibatuta duten bisitariei erakusten zaie."
+
+#: blocks/booking/editor.js:68
+msgid "Booking calendar"
+msgstr "Erreserba-egutegia"
+
+#: blocks/booking/block.json
+msgctxt "block title"
+msgid "Booking calendar"
+msgstr "Erreserba-egutegia"
+
+#: blocks/booking/block.json
+msgctxt "block description"
+msgid "Let visitors book a call or appointment."
+msgstr "Utzi bisitariei dei edo hitzordu bat erreserbatzen."
+
+#: blocks/booking/block.json
+msgctxt "block keyword"
+msgid "booking"
+msgstr "erreserba"
+
+#: blocks/booking/block.json
+msgctxt "block keyword"
+msgid "appointment"
+msgstr "hitzordu"
+
+#: blocks/booking/block.json
+msgctxt "block keyword"
+msgid "calendar"
+msgstr "egutegia"
+
+#: blocks/booking/block.json
+msgctxt "block keyword"
+msgid "hitzordu"
+msgstr "hitzordu"
