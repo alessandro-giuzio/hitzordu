@@ -28,6 +28,8 @@ class Plugin {
 		$hours_page = new Admin\HoursPage();
 		add_action('admin_menu', array($hours_page, 'register_menu'));
 		add_action('admin_post_' . Admin\HoursPage::ACTION, array($hours_page, 'save'));
+		add_action('init', array($this, 'register_block'));
+		add_action('enqueue_block_editor_assets', array($this, 'editor_data'));
 
 		$this->maybe_upgrade();
 	}
@@ -90,6 +92,11 @@ class Plugin {
 	 *
 	 * @param array|string $atts Shortcode attributes.
 	 */
+	/**
+	 * The [hitzordu] shortcode.
+	 *
+	 * @param array|string $atts Shortcode attributes.
+	 */
 	public function render_shortcode($atts): string
 	{
 		$atts = shortcode_atts(
@@ -101,12 +108,24 @@ class Plugin {
 			'hitzordu'
 		);
 
+		return $this->render_widget((string) $atts['type'], (string) $atts['contact']);
+	}
+
+	/**
+	 * Print the widget element and ask WordPress to load the script.
+	 * Used by both the shortcode and the block.
+	 *
+	 * @param string $type    Meeting type slug.
+	 * @param string $contact Optional URL shown when JavaScript is off.
+	 */
+	public function render_widget(string $type, string $contact = ''): string
+	{
 		wp_enqueue_script_module('hitzordu-widget');
 
 		$fallback = esc_html__('The booking calendar needs JavaScript to work.', 'hitzordu');
 
-		if ('' !== $atts['contact']) {
-			$fallback .= ' <a href="' . esc_url($atts['contact']) . '">'
+		if ('' !== $contact) {
+			$fallback .= ' <a href="' . esc_url($contact) . '">'
 				. esc_html__('Contact us to arrange a call instead.', 'hitzordu')
 				. '</a>';
 		}
@@ -114,8 +133,34 @@ class Plugin {
 		return sprintf(
 			'<hitzordu-widget api-url="%1$s" meeting-type="%2$s"><noscript><p>%3$s</p></noscript></hitzordu-widget>',
 			esc_url(rest_url('hitzordu/v1')),
-			esc_attr(sanitize_key($atts['type'])),
+			esc_attr(sanitize_key($type)),
 			$fallback // Each part is escaped above.
+		);
+	}
+
+	/**
+	 * Register the booking block from its block.json.
+	 */
+	public function register_block(): void
+	{
+		register_block_type(HITZORDU_DIR . 'blocks/booking');
+	}
+
+	/**
+	 * Give the block editor the list of active meeting types.
+	 */
+	public function editor_data(): void
+	{
+		global $wpdb;
+
+		$types = $wpdb->get_results(
+			"SELECT slug, name, duration_minutes FROM {$wpdb->prefix}hitzordu_meeting_types WHERE active = 1 ORDER BY name"
+		);
+
+		wp_add_inline_script(
+			generate_block_asset_handle('hitzordu/booking', 'editorScript'),
+			'window.hitzorduMeetingTypes = ' . wp_json_encode($types) . ';',
+			'before'
 		);
 	}
 }

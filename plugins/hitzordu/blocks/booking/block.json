@@ -1,0 +1,22 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "hitzordu/booking",
+  "title": "Booking calendar",
+  "category": "widgets",
+  "icon": "calendar-alt",
+  "description": "Let visitors book a call or appointment.",
+  "keywords": ["booking", "appointment", "calendar", "hitzordu"],
+  "textdomain": "hitzordu",
+  "attributes": {
+    "type": { "type": "string", "default": "discovery-call" },
+    "contact": { "type": "string", "default": "" }
+  },
+  "supports": {
+    "html": false,
+    "align": ["wide"],
+    "spacing": { "margin": true }
+  },
+  "editorScript": "file:./editor.js",
+  "render": "file:./render.php"
+}
