@@ -7,10 +7,10 @@ export default defineConfig({
   // Library builds don't set this automatically, and Vue needs it.
   define: { 'process.env.NODE_ENV': JSON.stringify('production') },
   build: {
-    outDir: resolve(__dirname, '../../plugins/hitzordu/public/js'),
+    outDir: resolve(import.meta.dirname, '../../plugins/hitzordu/public/js'),
     emptyOutDir: true,
     lib: {
-      entry: resolve(__dirname, 'src/main.ts'),
+      entry: resolve(import.meta.dirname, 'src/main.ts'),
       formats: ['es'],
       fileName: () => 'hitzordu-widget.js',
     },

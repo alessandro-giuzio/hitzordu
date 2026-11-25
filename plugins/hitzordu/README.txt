@@ -11,21 +11,31 @@ Appointment and call booking for WordPress.
 
 == Description ==
 
-Hitzordu lets visitors book appointments. This version sets up the plugin
-structure and the database tables (meeting types, availability rules, date
-overrides and bookings). The booking interface and REST API are still to come.
+Hitzordu lets visitors book appointments on your site. Visitors pick a day on an
+accessible month calendar, see times in their own time zone, and get a
+confirmation email with a cancel link. You get a notification email and an
+admin screen with all bookings.
+
+Features:
+
+* Booking widget as a shortcode, `[hitzordu]`, or as a block.
+* Weekly working hours, date overrides, buffers, minimum notice and booking window.
+* Server-side double-booking protection, a honeypot field and rate limiting.
+* Cancel link with a confirm step, so email scanners cannot cancel by accident.
+* Translations: English, Spanish, Italian and Basque.
 
 == Installation ==
 
 1. Run `composer install` in the plugin folder.
 2. Activate the plugin from the Plugins screen.
+3. Add the `[hitzordu]` shortcode to a page, or insert the booking block.
 
 == Uninstall ==
 
-Deleting the plugin keeps its data by default. Set the option
-`hitzordu_delete_data_on_uninstall` to a truthy value to drop the tables on delete.
+Deleting the plugin keeps its data by default. To drop the tables and settings on
+delete, tick the delete-data option on the Hitzordu settings screen first.
 
 == Changelog ==
 
 = 1.0.0 =
-* Initial structure and database schema.
+* Initial release.
