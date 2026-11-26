@@ -4,7 +4,10 @@ Accessible appointment booking for WordPress and static sites. One Vue custom el
 
 _Hitzordu_ is Basque for "appointment".
 
-![The Hitzordu booking widget](docs/screenshot.png)
+<p>
+  <img src="docs/screenshot.png" alt="The Hitzordu booking widget: choosing a day on the month calendar" width="49%">
+  <img src="docs/screenshot-times.png" alt="The Hitzordu booking widget: choosing a time" width="49%">
+</p>
 
 ## Why
 
