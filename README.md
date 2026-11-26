@@ -135,14 +135,20 @@ cd packages/widget && npm test
 
 The PHP tests cover slot generation, including daylight saving changes and overlapping bookings. The widget tests cover calendar maths, keyboard movement, time zone grouping, and the booking flow, including retries and slot conflicts.
 
+## Release zip
+
+```bash
+scripts/build-release.sh
+```
+
+This tests and builds the widget, installs production Composer dependencies (with a real copy of `packages/core`), checks the result, and writes `dist/hitzordu-<version>.zip`. Upload that file under Plugins, Add New, Upload Plugin. The version is read from the header in `plugins/hitzordu/plugin.php`.
+
 ## Status
 
-Working and in active development. Done: the full booking flow, emails, cancellation, spam protection, admin screens, the accessible widget, buffers, minimum notice, booking window and date overrides, a block for the block editor, and translations (English, Spanish, Basque and Italian).
+Working and in active development. Done: the full booking flow, emails, cancellation, spam protection, admin screens, the accessible widget, buffers, minimum notice, booking window and date overrides, a block for the block editor, translations (English, Spanish, Basque and Italian), a compact card design, and an installable release zip.
 
 Planned:
 
-- A visual redesign of the widget
-- An installable release zip
 - A Laravel API so the same widget works on static sites
 
 ## Built with
