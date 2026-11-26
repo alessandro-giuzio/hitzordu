@@ -137,13 +137,11 @@ The PHP tests cover slot generation, including daylight saving changes and overl
 
 ## Status
 
-Working and in active development. Done: the full booking flow, emails, cancellation, spam protection, admin screens, and the accessible widget.
+Working and in active development. Done: the full booking flow, emails, cancellation, spam protection, admin screens, the accessible widget, buffers, minimum notice, booking window and date overrides, a block for the block editor, and translations (English, Spanish, Basque and Italian).
 
 Planned:
 
-- Buffers between meetings, minimum notice, booking window, and holiday overrides
-- A block for the block editor
-- Translations: English, Spanish, Basque, and Italian
+- A visual redesign of the widget
 - An installable release zip
 - A Laravel API so the same widget works on static sites
 
