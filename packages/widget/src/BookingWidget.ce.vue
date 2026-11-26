@@ -41,7 +41,7 @@ const weekStart = weekStartForLocale(locale)
 const timesId = useId()
 
 const dateFormat = new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' })
-const timeFormat = new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit', timeZone })
+const timeFormat = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit', timeZone })
 
 function dateLabel(day: string): string {
   return day ? dateFormat.format(parseIsoDate(day)) : ''
@@ -167,22 +167,34 @@ onMounted(load)
 /*
  * Public theming hooks. Set any of these on the element from the site's CSS:
  *   hitzordu-widget { --hitzordu-accent: #0f766e; }
+ *
+ *   --hitzordu-accent           buttons, selected day, available days
+ *   --hitzordu-accent-contrast  text on the accent colour
+ *   --hitzordu-background       card background (default: transparent)
+ *   --hitzordu-border           card and input borders
+ *   --hitzordu-muted            secondary text
+ *   --hitzordu-radius           corner radius
+ *   --hitzordu-max-width        card width
+ *   --hitzordu-font-size        base text size
+ *   --hitzordu-font             font family (default: the page's)
+ *   --hitzordu-text             text colour (default: the page's)
  */
 :host {
   --_accent: var(--hitzordu-accent, #1d4ed8);
   --_on-accent: var(--hitzordu-accent-contrast, #ffffff);
-  --_radius: var(--hitzordu-radius, 0.5em);
+  --_radius: var(--hitzordu-radius, 0.75em);
   --_border: var(
     --hitzordu-border,
-    color-mix(in srgb, currentColor 25%, transparent)
+    color-mix(in srgb, currentColor 20%, transparent)
   );
   --_muted: var(
     --hitzordu-muted,
-    color-mix(in srgb, currentColor 75%, transparent)
+    color-mix(in srgb, currentColor 65%, transparent)
   );
+  --_tint: color-mix(in srgb, var(--_accent) 12%, transparent);
 
   display: block;
-  max-width: var(--hitzordu-max-width, 28em);
+  max-width: var(--hitzordu-max-width, 26em);
   container-type: inline-size;
   /* Never smaller than 16px, even on themes that set the root font size to 62.5%,
      but still larger when the visitor has raised their browser's text size. */
@@ -203,13 +215,34 @@ onMounted(load)
   outline-offset: 2px;
 }
 
+/* When the script focuses a heading inside this shadow tree, the browser also
+   treats the host as focused, and many themes draw a square outline on it. The
+   real controls inside keep their own focus rings. */
+:host(:focus),
+:host(:focus-visible) {
+  outline: none !important;
+}
+
 p {
   margin: 0 0 1em;
 }
 
+/* The card */
+
+.hz {
+  padding: 1.5em;
+  border: 1px solid var(--_border);
+  border-radius: calc(var(--_radius) * 1.5);
+  background: var(--hitzordu-background, transparent);
+  box-shadow:
+    0 1px 3px color-mix(in srgb, currentColor 10%, transparent),
+    0 8px 24px color-mix(in srgb, currentColor 6%, transparent);
+}
+
 .hz-heading {
-  margin: 0 0 0.75em;
-  font-size: 1.25em;
+  margin: 0 0 0.5em;
+  font-size: 1.125em;
+  font-weight: 700;
   line-height: 1.3;
 }
 
@@ -224,27 +257,31 @@ p {
 }
 
 .hz-alert {
+  margin-bottom: 1em;
   padding: 0.75em 1em;
-  border: 1px solid currentColor;
-  border-left-width: 0.3em;
+  border: 1px solid color-mix(in srgb, currentColor 30%, transparent);
+  border-left: 0.3em solid currentColor;
   border-radius: var(--_radius);
+  background: color-mix(in srgb, currentColor 6%, transparent);
 }
 
 /* Buttons */
 
 .hz-button {
   min-height: 2.75em;
-  padding: 0.5em 1em;
+  padding: 0.5em 1.25em;
   border: 1px solid var(--_border);
   border-radius: var(--_radius);
   background: transparent;
   color: inherit;
   font: inherit;
+  font-weight: 600;
   cursor: pointer;
 }
 
 .hz-button:hover:not(:disabled) {
-  border-color: currentColor;
+  border-color: var(--_accent);
+  background: var(--_tint);
 }
 
 .hz-button:disabled {
@@ -256,17 +293,19 @@ p {
   border-color: var(--_accent);
   background: var(--_accent);
   color: var(--_on-accent);
-  font-weight: 600;
 }
 
 .hz-button--primary:hover:not(:disabled) {
   border-color: var(--_accent);
+  background: var(--_accent);
+  filter: brightness(1.1);
 }
 
 .hz-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5em;
+  margin-top: 0.5em;
 }
 
 .hz-actions .hz-button {
@@ -280,19 +319,33 @@ p {
   align-items: center;
   justify-content: space-between;
   gap: 0.5em;
-  margin-bottom: 0.5em;
+  margin-bottom: 0.25em;
 }
 
 .hz-month-title {
   margin: 0;
   font-size: 1em;
-  font-weight: 600;
+  font-weight: 700;
+  text-align: center;
+  text-transform: capitalize;
 }
 
 .hz-nav {
-  width: 2.75em;
+  flex: none;
+  width: 2.2em;
+  min-height: 2.2em;
   padding: 0;
-  font-size: 1.1em;
+  border-color: transparent;
+  border-radius: 50%;
+  background: var(--_tint);
+  color: var(--_accent);
+  font-size: 1.25em;
+  line-height: 1;
+}
+
+.hz-nav:hover:not(:disabled) {
+  background: var(--_accent);
+  color: var(--_on-accent);
 }
 
 .hz-grid {
@@ -302,11 +355,13 @@ p {
 }
 
 .hz-grid th {
-  padding: 0.25em 0;
+  padding: 0.5em 0;
   color: var(--_muted);
   font-size: 0.75em;
   font-weight: 600;
+  letter-spacing: 0.04em;
   text-align: center;
+  text-transform: uppercase;
 }
 
 .hz-grid abbr {
@@ -314,44 +369,49 @@ p {
 }
 
 .hz-grid td {
-  padding: 2px;
+  padding: 2px 0;
   text-align: center;
 }
 
 .hz-day {
+  position: relative;
+  display: block;
   width: 100%;
+  max-width: 2.75em;
   min-height: 2.75em;
+  margin: 0 auto;
   padding: 0;
   border: 2px solid transparent;
-  border-radius: var(--_radius);
+  border-radius: 50%;
   background: transparent;
-  color: inherit;
+  color: var(--_muted);
   font: inherit;
-  cursor: pointer;
+  cursor: default;
 }
 
+/* Available days: a tinted circle and bold accent text, so it is not colour alone. */
 .hz-day[data-available] {
-  background: color-mix(in srgb, var(--_accent) 12%, transparent);
-  font-weight: 600;
+  background: var(--_tint);
+  color: var(--_accent);
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .hz-day[data-available]:hover {
   border-color: var(--_accent);
 }
 
-.hz-day[aria-disabled='true'] {
-  color: var(--_muted);
-  text-decoration: line-through;
-  cursor: default;
-}
-
-.hz-day[aria-current='date'] {
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
-}
-
-.hz-day[aria-disabled='true'][aria-current='date'] {
-  text-decoration: line-through underline;
+/* Today: a small dot under the number. */
+.hz-day[aria-current='date']::after {
+  content: '';
+  position: absolute;
+  bottom: 0.3em;
+  left: 50%;
+  width: 0.3em;
+  height: 0.3em;
+  margin-left: -0.15em;
+  border-radius: 50%;
+  background: currentColor;
 }
 
 .hz-day[data-selected] {
@@ -362,17 +422,28 @@ p {
 
 /* Times */
 
+/* One scrolling column of times, like Calendly. The padding and negative margin
+   keep the focus rings from being clipped by the scroll area. */
 .hz-times {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(6em, 1fr));
   gap: 0.5em;
-  margin: 0 0 1em;
-  padding: 0;
+  max-width: 16em;
+  max-height: 20em;
+  margin: 0 auto 1em;
+  padding: 4px;
+  overflow-y: auto;
   list-style: none;
 }
 
 .hz-time {
   width: 100%;
+  border-color: var(--_accent);
+  color: var(--_accent);
+}
+
+.hz-time:hover:not(:disabled) {
+  background: var(--_accent);
+  color: var(--_on-accent);
 }
 
 /* Form */
@@ -381,6 +452,7 @@ p {
   display: grid;
   gap: 0.25em;
   margin-bottom: 1em;
+  font-weight: 600;
 }
 
 .hz-input {
@@ -392,16 +464,18 @@ p {
   background: transparent;
   color: inherit;
   font: inherit;
+  font-weight: 400;
+}
+
+.hz-input:focus-visible {
+  border-color: var(--_accent);
+  outline-offset: 0;
 }
 
 /* Layout responds to the widget's own width, not the window's. */
-@container (min-width: 24em) {
-  .hz-actions .hz-button {
-    flex: 0 0 auto;
-  }
-
-  .hz-day {
-    min-height: 3em;
+@container (max-width: 20em) {
+  .hz {
+    padding: 1em;
   }
 }
 
@@ -410,7 +484,8 @@ p {
   .hz-day {
     transition:
       border-color 0.15s,
-      background-color 0.15s;
+      background-color 0.15s,
+      color 0.15s;
   }
 }
 
@@ -420,6 +495,10 @@ p {
     border-color: Highlight;
     background: Highlight;
     color: HighlightText;
+  }
+
+  .hz-day[aria-disabled='true'] {
+    text-decoration: line-through;
   }
 }
 </style>
